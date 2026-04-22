@@ -123,12 +123,13 @@ jobs:
         run: |
           # 获取缓存列表并删除
           gh cache list --key ${{ matrix.os }}-${{ hashFiles('**/repo_flag') }}- --json key --jq '.[] | .key' | while read -r key; do
-            gh cache delete "$key"
+            gh cache delete "$key" || true  # Don't fail if deletion fails
           done
           # 输出缓存状态
           echo "========cache status========"
           echo "ccache: $(du -sh ./action_build/.ccache | cut -f 1)"
           echo "staging: $(du -sh ./action_build/staging_dir | cut -f 1)"
+        continue-on-error: true
 
       - name: Machine Information (Post-build)
         run: |
